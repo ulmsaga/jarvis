@@ -4,23 +4,14 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
-    # Slack
+    # Slack (필수)
     slack_bot_token: str
     slack_signing_secret: str
-    slack_app_token: str = ""
 
-    # OpenAI (Brain / Codex)
-    openai_api_key: str
-    openai_model: str = "gpt-4o"
-
-    # Anthropic (Claude Code / Skills)
-    anthropic_api_key: str
-    claude_model: str = "claude-opus-4-7"
-
-    # GitHub
+    # GitHub (PR 자동 생성용)
     github_token: str = ""
-    github_owner: str = ""
-    github_repo: str = ""
+    github_owner: str = "ulmsaga"
+    github_repo: str = "vizops"
 
     # Server
     host: str = "0.0.0.0"
