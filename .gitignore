@@ -7,3 +7,19 @@ __pycache__/
 .DS_Store
 jarvis_wt_*/
 jarvis_memory.db
+
+# OpenClaw runtime (credentials, agent state)
+.openclaw/
+
+# Bridge runtime state
+bridge/inbox/
+bridge/queue/
+bridge/pending/
+bridge/processing/
+bridge/processor.log
+
+# Projects are separate repos
+projects/
+
+# Memory is runtime log
+memory/
