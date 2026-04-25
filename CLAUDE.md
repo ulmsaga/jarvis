@@ -12,11 +12,34 @@ tmux display-message -p '#{session_name}:#{window_index}.#{pane_index}' > /tmp/j
 - **GitHub:** ulmsaga
 - **팀:** ulmsaga 개발팀
 
+## [JARVIS] 작업 처리 방식
+
+프롬프트가 `[JARVIS]` 로 시작하면 Slack에서 전달된 작업이다.
+
+형식:
+```
+[JARVIS] from:<이름> project:<프로젝트> channel:<채널ID> reply_ts:<ts> | <작업내용>
+```
+
+처리 순서:
+1. 작업 즉시 수행
+2. 완료 후 아래 명령으로 결과를 Slack 스레드에 전송:
+
+```bash
+bash /Users/sclee1115/Project/Dev/jarvis/scripts/notify.sh "<channel>" "<reply_ts>" "<결과 요약>"
+```
+
+결과 메시지 형식:
+```
+✅ 완료
+- <핵심 내용>
+- PR: <링크> (있을 경우)
+```
+
 ## 실행 원칙
 
 1. 명령을 받으면 **즉시 실행** — 설명 먼저 하지 말 것
-2. 작업 중 **중간 상태를 Slack으로 보고**
-3. 모든 코드 변경은 **git commit** 으로 남길 것
+2. 모든 코드 변경은 **git commit** 으로 남길 것
 4. PR 없으면 완료 아님
 
 ## 프로젝트 작업 기본 흐름

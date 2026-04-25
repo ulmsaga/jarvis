@@ -28,15 +28,17 @@ inject_task() {
   pane=$(get_pane) || { log "SKIP: pane 미등록 ($fname)"; return 1; }
 
   local command from project channel reply_ts
-  command=$(python3 -c "import json; d=json.load(open('$file')); print(d.get('command',''))" 2>/dev/null)
-  from=$(python3   -c "import json; d=json.load(open('$file')); print(d.get('from',''))" 2>/dev/null)
-  project=$(python3 -c "import json; d=json.load(open('$file')); print(d.get('project',''))" 2>/dev/null)
+  command=$(python3  -c "import json; d=json.load(open('$file')); print(d.get('command',''))" 2>/dev/null)
+  from=$(python3     -c "import json; d=json.load(open('$file')); print(d.get('from',''))" 2>/dev/null)
+  project=$(python3  -c "import json; d=json.load(open('$file')); print(d.get('project',''))" 2>/dev/null)
+  channel=$(python3  -c "import json; d=json.load(open('$file')); print(d.get('channel',''))" 2>/dev/null)
+  reply_ts=$(python3 -c "import json; d=json.load(open('$file')); print(d.get('reply_ts',''))" 2>/dev/null)
 
   [ -z "$command" ] && { log "SKIP: command 없음 ($fname)"; mv "$file" "$PROCESSING/$fname"; return 0; }
 
   mv "$file" "$PROCESSING/$fname"
 
-  local prompt="[JARVIS] from:${from} project:${project} | ${command}"
+  local prompt="[JARVIS] from:${from} project:${project} channel:${channel} reply_ts:${reply_ts} | ${command}"
   tmux send-keys -t "$pane" "$prompt"
   sleep 0.3
   tmux send-keys -t "$pane" "" Enter
