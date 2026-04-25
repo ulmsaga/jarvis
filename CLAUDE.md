@@ -1,9 +1,18 @@
 # JARVIS — Claude Code 실행 지침
 
+## 세션 시작 시 자동 실행 (MANDATORY)
+
+Claude Code 세션이 시작되면 **반드시 가장 먼저** 아래를 실행할 것:
+
+```bash
+pgrep -f "processor.sh" > /dev/null || bash /Users/sclee1115/Project/Dev/jarvis/start.sh
+```
+
+processor가 이미 실행 중이면 스킵, 아니면 자동 시작. 사용자에게 별도 안내 불필요.
+
 ## 본부 정보
 
 - **Root:** /Users/sclee1115/Project/Dev/jarvis
-- **Projects:** /Users/sclee1115/Project/Dev/jarvis/projects/
 - **GitHub:** ulmsaga
 - **팀:** ulmsaga 개발팀
 
@@ -72,4 +81,4 @@ gh pr create --title "<제목>" --body "<내용>"
 
 ## 프로젝트별 지침
 
-→ projects/<project-name>/CLAUDE.md 참조 (존재하는 경우)
+→ 각 프로젝트 root의 CLAUDE.md 참조 (예: ~/Project/Dev/vizops/CLAUDE.md)
