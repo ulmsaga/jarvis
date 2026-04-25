@@ -188,9 +188,51 @@ jarvis/
 
 ## 7. 선결 조건
 
-- [ ] Slack App에 **Socket Mode** 활성화
-- [ ] `SLACK_APP_TOKEN` (`xapp-...`) 발급 및 `.env` 추가
-- [ ] Slack Bot이 대상 채널에 초대되어 있는지 확인
-- [ ] Claude Code를 실행한 터미널에서 `/tmp/jarvis-pane` 등록 방법 결정
-      → 옵션 A: `start.sh` 에 pane 등록 명령 포함
-      → 옵션 B: Claude Code 시작 후 별도 명령으로 수동 등록
+- [x] Slack App에 **Socket Mode** 활성화
+- [x] `SLACK_APP_TOKEN` (`xapp-...`) 발급 및 `.env` 추가
+- [x] Slack Bot이 대상 채널에 초대
+- [x] `app_mention` 이벤트 구독
+
+---
+
+## 8. 사용법
+
+### Jarvis 시작
+
+터미널에서 한 번만 실행:
+
+```bash
+bash ~/Project/Dev/jarvis/jarvis.sh
+```
+
+→ tmux `jarvis` 세션 생성(또는 재접속) → bot + injector 백그라운드 시작 → Claude Code 자동 실행
+
+### Slack에서 작업 전달
+
+```
+@jarvis #프로젝트명 작업내용
+```
+
+예시:
+```
+@jarvis #vizops 메인 페이지 로딩 속도 개선해줘
+@jarvis #jarvis start.sh 버그 수정해줘
+@jarvis 현재 진행 상황 알려줘
+```
+
+- `#프로젝트명` 은 선택사항 (없으면 unknown 처리)
+- Bot이 "작업 중입니다. 잠시만 기다려 주세요." 스레드 응답
+- Claude Code 터미널에서 작업 진행 (thinking... 표시)
+- 완료 후 Slack 스레드에 결과 자동 전송
+
+### 상태 확인
+
+```bash
+bash ~/Project/Dev/jarvis/status.sh
+```
+
+### Jarvis 종료
+
+```bash
+bash ~/Project/Dev/jarvis/stop.sh
+```
