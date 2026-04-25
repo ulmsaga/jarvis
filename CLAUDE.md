@@ -5,7 +5,10 @@
 Claude Code 세션이 시작되면 **반드시 가장 먼저** 아래를 실행할 것:
 
 ```bash
-# processor + OpenClaw 기동
+# 1. 현재 tmux pane ID 저장 (자동 주입 대상 등록)
+tmux display-message -p '#{session_name}:#{window_index}.#{pane_index}' > /tmp/jarvis-active-pane 2>/dev/null
+
+# 2. processor + OpenClaw 기동
 pgrep -f "processor.sh" > /dev/null || bash /Users/sclee1115/Project/Dev/jarvis/start.sh
 ```
 
