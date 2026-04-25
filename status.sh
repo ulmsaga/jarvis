@@ -1,35 +1,34 @@
 #!/bin/bash
 # Jarvis 상태 확인
 
-JARVIS_ROOT="/Users/sclee1115/Project/Dev/jarvis"
+JARVIS_ROOT="$(cd "$(dirname "$0")" && pwd)"
 
 echo "=== Jarvis Status ==="
-echo ""
 
-# processor
-if pgrep -f "processor.sh" > /dev/null; then
-  echo "✅ Processor: running (PID: $(pgrep -f processor.sh))"
+check() {
+  local name="$1"
+  local pidfile="$2"
+  if [ -f "$pidfile" ] && kill -0 "$(cat "$pidfile")" 2>/dev/null; then
+    echo "✅ $name: running (PID: $(cat "$pidfile"))"
+  else
+    echo "❌ $name: not running"
+  fi
+}
+
+check "Bot"      "/tmp/jarvis-bot.pid"
+check "Injector" "/tmp/jarvis-injector.pid"
+
+echo ""
+PANE=$(cat /tmp/jarvis-pane 2>/dev/null)
+if [ -n "$PANE" ]; then
+  echo "🖥  Claude Code pane: $PANE"
 else
-  echo "❌ Processor: stopped"
+  echo "⚠️  Claude Code pane: 미등록"
 fi
 
-# openclaw
-if pgrep -f "openclaw" > /dev/null; then
-  echo "✅ OpenClaw:  running (PID: $(pgrep -f openclaw))"
-else
-  echo "❌ OpenClaw:  stopped"
-fi
+QUEUE_COUNT=$(ls "$JARVIS_ROOT/bridge/queue"/task-*.json 2>/dev/null | wc -l | tr -d ' ')
+echo "📬 Queue 대기: ${QUEUE_COUNT}건"
 
-# 큐 상태
-INBOX=$(ls "$JARVIS_ROOT/bridge/inbox/"*.json 2>/dev/null | wc -l | tr -d ' ')
-QUEUE=$(ls "$JARVIS_ROOT/bridge/queue/"*.json 2>/dev/null | wc -l | tr -d ' ')
-PENDING=$(ls "$JARVIS_ROOT/bridge/pending/"*.json 2>/dev/null | wc -l | tr -d ' ')
-
-echo "📥 Inbox:   $INBOX"
-echo "📦 Queue:   $QUEUE"
-echo "⏳ Pending: $PENDING"
 echo ""
-
-# 최근 로그
-echo "=== Recent Log ==="
-tail -5 "$JARVIS_ROOT/bridge/processor.log" 2>/dev/null || echo "(no log)"
+echo "=== Recent Bot Log ==="
+tail -5 "$JARVIS_ROOT/bridge/bot.log" 2>/dev/null || echo "(no log)"

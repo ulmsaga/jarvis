@@ -1,18 +1,20 @@
 #!/bin/bash
-# Jarvis 종료 스크립트
+# Jarvis 종료 — Bot + Injector
 
-# processor 종료
-if pgrep -f "processor.sh" > /dev/null; then
-  pkill -f "processor.sh"
-  echo "🛑 Processor: stopped"
-else
-  echo "ℹ️  Processor: not running"
-fi
+stop_pid() {
+  local name="$1"
+  local pidfile="$2"
+  local pattern="$3"
 
-# OpenClaw 종료
-if pgrep -f "openclaw" > /dev/null; then
-  pkill -f "openclaw"
-  echo "🛑 OpenClaw: stopped"
-else
-  echo "ℹ️  OpenClaw: not running"
-fi
+  if [ -f "$pidfile" ] && kill -0 "$(cat "$pidfile")" 2>/dev/null; then
+    kill "$(cat "$pidfile")" 2>/dev/null
+    rm -f "$pidfile"
+    echo "🛑 $name: stopped"
+  else
+    pkill -f "$pattern" 2>/dev/null && echo "🛑 $name: stopped" || echo "ℹ️  $name: not running"
+    rm -f "$pidfile"
+  fi
+}
+
+stop_pid "Bot"      "/tmp/jarvis-bot.pid"      "bot/app.py"
+stop_pid "Injector" "/tmp/jarvis-injector.pid" "injector.sh"

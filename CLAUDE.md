@@ -1,35 +1,5 @@
 # JARVIS — Claude Code 실행 지침
 
-## 세션 시작 시 자동 실행 (MANDATORY)
-
-Claude Code 세션이 시작되면 **반드시 가장 먼저** 아래를 실행할 것:
-
-```bash
-# 1. 현재 tmux pane ID 저장 (자동 주입 대상 등록)
-tmux display-message -p '#{session_name}:#{window_index}.#{pane_index}' > /tmp/jarvis-active-pane 2>/dev/null
-
-# 2. processor + OpenClaw 기동
-pgrep -f "processor.sh" > /dev/null || bash /Users/sclee1115/Project/Dev/jarvis/start.sh
-```
-
-start.sh 하나로 processor / OpenClaw 기동됨. 사용자에게 별도 안내 불필요.
-
-그 다음, queue에 대기 중인 작업 확인:
-
-```bash
-ls /Users/sclee1115/Project/Dev/jarvis/bridge/queue/*.json 2>/dev/null
-```
-
-파일이 있으면 내용을 읽고 즉시 처리. 처리 후 파일을 `bridge/processing/`으로 이동.
-
-## Queue 작업 처리 방식
-
-`UserPromptSubmit` 훅이 queue 항목을 자동으로 이 세션에 주입함.
-queue 작업이 주입되면:
-1. JSON에서 `command` 필드 추출
-2. 해당 명령을 이 세션에서 직접 수행
-3. 결과를 `channel` 필드의 Slack 채널로 전송
-
 ## 본부 정보
 
 - **Root:** /Users/sclee1115/Project/Dev/jarvis
@@ -39,7 +9,7 @@ queue 작업이 주입되면:
 ## 실행 원칙
 
 1. 명령을 받으면 **즉시 실행** — 설명 먼저 하지 말 것
-2. 작업 중 **중간 상태를 Slack으로 보고** (coding-agent 완료 후 jarvis가 전달)
+2. 작업 중 **중간 상태를 Slack으로 보고**
 3. 모든 코드 변경은 **git commit** 으로 남길 것
 4. PR 없으면 완료 아님
 
@@ -56,7 +26,6 @@ mkdir <project-name> && cd <project-name> && git init
 git checkout -b feat/<작업명>
 
 # 3. 작업 수행
-# (코딩, Docker, 테스트 등)
 
 # 4. 커밋
 git add -A && git commit -m "<type>: <내용>"
@@ -101,4 +70,4 @@ gh pr create --title "<제목>" --body "<내용>"
 
 ## 프로젝트별 지침
 
-→ 각 프로젝트 root의 CLAUDE.md 참조 (예: ~/Project/Dev/vizops/CLAUDE.md)
+→ 각 프로젝트 root의 CLAUDE.md 참조
