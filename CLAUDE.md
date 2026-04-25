@@ -1,5 +1,11 @@
 # JARVIS — Claude Code 실행 지침
 
+## 세션 시작 시 자동 실행
+
+```bash
+tmux display-message -p '#{session_name}:#{window_index}.#{pane_index}' > /tmp/jarvis-pane 2>/dev/null
+```
+
 ## 본부 정보
 
 - **Root:** /Users/sclee1115/Project/Dev/jarvis

@@ -51,19 +51,24 @@ def save_task(task: dict) -> Path:
 @app.event("app_mention")
 def handle_mention(event, client, say):
     text = event.get("text", "")
+    print(f"[MENTION] {event.get('user')} → {text}", flush=True)
+
     task = parse_message(text, client, event)
+    print(f"[TASK] from={task['from']} project={task['project']} command={task['command']}", flush=True)
 
     if not task["command"]:
         say(text="명령어를 입력해 주세요.", thread_ts=event["ts"])
         return
 
-    save_task(task)
+    path = save_task(task)
+    print(f"[QUEUE] 저장됨: {path}", flush=True)
 
     client.chat_postMessage(
         channel=event["channel"],
         thread_ts=event["ts"],
         text="작업 중입니다. 잠시만 기다려 주세요.",
     )
+    print(f"[SLACK] 접수 응답 전송 완료", flush=True)
 
 
 @app.event("message")

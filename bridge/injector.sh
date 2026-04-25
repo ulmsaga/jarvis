@@ -19,15 +19,6 @@ get_pane() {
   echo "$pane"
 }
 
-is_claude_ready() {
-  local pane="$1"
-  # pane 하단 출력에서 Claude Code 프롬프트(>) 확인
-  local last
-  last=$(tmux capture-pane -t "$pane" -p 2>/dev/null | grep -v '^$' | tail -1)
-  echo "$last" | grep -qE '^\s*>' && return 0
-  return 1
-}
-
 inject_task() {
   local file="$1"
   local fname
@@ -35,11 +26,6 @@ inject_task() {
 
   local pane
   pane=$(get_pane) || { log "SKIP: pane 미등록 ($fname)"; return 1; }
-
-  if ! is_claude_ready "$pane"; then
-    log "WAIT: Claude Code 프롬프트 대기 중 ($fname)"
-    return 1
-  fi
 
   local command from project channel reply_ts
   command=$(python3 -c "import json; d=json.load(open('$file')); print(d.get('command',''))" 2>/dev/null)
