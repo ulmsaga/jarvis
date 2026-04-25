@@ -10,6 +10,22 @@ pgrep -f "processor.sh" > /dev/null || bash /Users/sclee1115/Project/Dev/jarvis/
 
 processor가 이미 실행 중이면 스킵, 아니면 자동 시작. 사용자에게 별도 안내 불필요.
 
+그 다음, queue에 대기 중인 작업 확인:
+
+```bash
+ls /Users/sclee1115/Project/Dev/jarvis/bridge/queue/*.json 2>/dev/null
+```
+
+파일이 있으면 내용을 읽고 즉시 처리. 처리 후 파일을 `bridge/processing/`으로 이동.
+
+## Queue 작업 처리 방식
+
+`UserPromptSubmit` 훅이 queue 항목을 자동으로 이 세션에 주입함.
+queue 작업이 주입되면:
+1. JSON에서 `command` 필드 추출
+2. 해당 명령을 이 세션에서 직접 수행
+3. 결과를 `channel` 필드의 Slack 채널로 전송
+
 ## 본부 정보
 
 - **Root:** /Users/sclee1115/Project/Dev/jarvis

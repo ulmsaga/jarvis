@@ -5,9 +5,10 @@ JARVIS_ROOT="/Users/sclee1115/Project/Dev/jarvis"
 INBOX="$JARVIS_ROOT/bridge/inbox"
 QUEUE="$JARVIS_ROOT/bridge/queue"
 PENDING="$JARVIS_ROOT/bridge/pending"
+PROCESSING="$JARVIS_ROOT/bridge/processing"
 BOT_TOKEN="${SLACK_BOT_TOKEN}"
 
-mkdir -p "$INBOX" "$QUEUE" "$PENDING"
+mkdir -p "$INBOX" "$QUEUE" "$PENDING" "$PROCESSING"
 
 slack_send() {
   local channel="$1"
@@ -34,8 +35,8 @@ route_file() {
     mv "$file" "$QUEUE/$filename"
   else
     echo "NEW_TASK:$filename:$command"
-    slack_send "$channel" "⚙️ 접수됨 — JARVIS가 처리합니다"
     mv "$file" "$QUEUE/$filename"
+    slack_send "$channel" "⚙️ 접수됨 — JARVIS 터미널에서 처리합니다. 잠시 기다려 주세요."
   fi
 }
 
