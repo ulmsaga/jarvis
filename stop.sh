@@ -4,19 +4,17 @@
 TMUX_SESSION="jarvis"
 
 # processor 종료
-PID=$(pgrep -f "processor.sh")
-if [ -n "$PID" ]; then
-  kill $PID 2>/dev/null
-  echo "🛑 Processor: stopped (PID: $PID)"
+if pgrep -f "processor.sh" > /dev/null; then
+  pkill -f "processor.sh"
+  echo "🛑 Processor: stopped"
 else
   echo "ℹ️  Processor: not running"
 fi
 
 # OpenClaw 종료
-PID=$(pgrep -f "openclaw")
-if [ -n "$PID" ]; then
-  kill $PID 2>/dev/null
-  echo "🛑 OpenClaw: stopped (PID: $PID)"
+if pgrep -f "openclaw" > /dev/null; then
+  pkill -f "openclaw"
+  echo "🛑 OpenClaw: stopped"
 else
   echo "ℹ️  OpenClaw: not running"
 fi

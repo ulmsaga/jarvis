@@ -23,11 +23,11 @@ else
   echo "🚀 tmux[$TMUX_SESSION]: started → claude 실행 중"
 fi
 
-# processor
+# processor (nohup 안정 데모난)
 if pgrep -f "processor.sh" > /dev/null; then
   echo "✅ Processor: already running (PID: $(pgrep -f processor.sh))"
 else
-  bash "$JARVIS_ROOT/processor.sh" >> "$JARVIS_ROOT/bridge/processor.log" 2>&1 &
+  nohup bash "$JARVIS_ROOT/processor.sh" >> "$JARVIS_ROOT/bridge/processor.log" 2>&1 &
   echo "🚀 Processor: started (PID: $!)"
 fi
 
@@ -36,7 +36,7 @@ if pgrep -f "openclaw" > /dev/null; then
   echo "✅ OpenClaw: already running (PID: $(pgrep -f openclaw))"
 else
   nvm use 22 --silent 2>/dev/null || nvm install 22 --silent
-  openclaw >> "$JARVIS_ROOT/bridge/openclaw.log" 2>&1 &
+  openclaw gateway >> "$JARVIS_ROOT/bridge/openclaw.log" 2>&1 &
   echo "🚀 OpenClaw: started (PID: $!)"
 fi
 
