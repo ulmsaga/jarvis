@@ -5,11 +5,11 @@
 Claude Code 세션이 시작되면 **반드시 가장 먼저** 아래를 실행할 것:
 
 ```bash
-# processor + OpenClaw + tmux(jarvis) 통합 기동
+# processor + OpenClaw 기동
 pgrep -f "processor.sh" > /dev/null || bash /Users/sclee1115/Project/Dev/jarvis/start.sh
 ```
 
-start.sh 하나로 processor / OpenClaw / tmux[jarvis] 모두 기동됨. 사용자에게 별도 안내 불필요.
+start.sh 하나로 processor / OpenClaw 기동됨. 사용자에게 별도 안내 불필요.
 
 그 다음, queue에 대기 중인 작업 확인:
 

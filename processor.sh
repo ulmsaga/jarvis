@@ -36,9 +36,7 @@ route_file() {
   else
     echo "NEW_TASK:$filename:$command"
     mv "$file" "$QUEUE/$filename"
-    slack_send "$channel" "⚙️ 접수됨 — JARVIS 터미널에서 처리합니다. 잠시 기다려 주세요."
-    # Claude Code 세션에 직접 주입
-    bash "$JARVIS_ROOT/bin/jarvis-inject.sh" >> "$JARVIS_ROOT/bridge/processor.log" 2>&1
+    slack_send "$channel" "⚙️ 접수됨 — Claude Code 터미널에서 처리합니다. 잠시 기다려 주세요."
   fi
 }
 
