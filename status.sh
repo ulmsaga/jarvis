@@ -13,6 +13,13 @@ else
   echo "❌ Processor: stopped"
 fi
 
+# openclaw
+if pgrep -f "openclaw" > /dev/null; then
+  echo "✅ OpenClaw:  running (PID: $(pgrep -f openclaw))"
+else
+  echo "❌ OpenClaw:  stopped"
+fi
+
 # 큐 상태
 INBOX=$(ls "$JARVIS_ROOT/bridge/inbox/"*.json 2>/dev/null | wc -l | tr -d ' ')
 QUEUE=$(ls "$JARVIS_ROOT/bridge/queue/"*.json 2>/dev/null | wc -l | tr -d ' ')

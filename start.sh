@@ -8,17 +8,26 @@ if [ -f "$JARVIS_ROOT/.env" ]; then
   export $(grep -v '^#' "$JARVIS_ROOT/.env" | xargs)
 fi
 
-# 이미 실행 중이면 스킵
+# nvm 로드 (비로그인 셸에서도 동작하도록)
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
+
+# processor
 if pgrep -f "processor.sh" > /dev/null; then
-  echo "✅ Jarvis processor already running (PID: $(pgrep -f processor.sh))"
+  echo "✅ Processor: already running (PID: $(pgrep -f processor.sh))"
 else
   bash "$JARVIS_ROOT/processor.sh" >> "$JARVIS_ROOT/bridge/processor.log" 2>&1 &
-  echo "🚀 Jarvis processor started (PID: $!)"
+  echo "🚀 Processor: started (PID: $!)"
 fi
 
-echo ""
-echo "📋 다음 단계:"
-echo "  1. OpenClaw 앱 실행 (Slack 수신)"
-echo "  2. Claude Code Monitor: $JARVIS_ROOT/bridge/processor.log"
+# OpenClaw (node 22 필요)
+if pgrep -f "openclaw" > /dev/null; then
+  echo "✅ OpenClaw: already running (PID: $(pgrep -f openclaw))"
+else
+  nvm use 22 --silent 2>/dev/null || nvm install 22 --silent
+  openclaw >> "$JARVIS_ROOT/bridge/openclaw.log" 2>&1 &
+  echo "🚀 OpenClaw: started (PID: $!)"
+fi
+
 echo ""
 echo "🔍 상태 확인: bash $JARVIS_ROOT/status.sh"
