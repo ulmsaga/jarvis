@@ -16,7 +16,7 @@ bridge/inbox/
 bridge/queue/
 bridge/pending/
 bridge/processing/
-bridge/processor.log
+bridge/*.log
 
 # Projects are separate repos
 projects/
