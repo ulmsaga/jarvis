@@ -77,6 +77,33 @@ def handle_message(event, client):
     if event.get("subtype") or event.get("bot_id"):
         return
 
+    # DM 처리 (channel_type이 im인 경우)
+    if event.get("channel_type") != "im":
+        return
+
+    text = event.get("text", "").strip()
+    if not text:
+        return
+
+    print(f"[DM] {event.get('user')} → {text}", flush=True)
+
+    task = parse_message(text, client, event)
+    print(f"[TASK] from={task['from']} project={task['project']} command={task['command']}", flush=True)
+
+    if not task["command"]:
+        client.chat_postMessage(channel=event["channel"], text="명령어를 입력해 주세요.")
+        return
+
+    path = save_task(task)
+    print(f"[QUEUE] 저장됨: {path}", flush=True)
+
+    client.chat_postMessage(
+        channel=event["channel"],
+        thread_ts=event["ts"],
+        text="작업 중입니다. 잠시만 기다려 주세요.",
+    )
+    print(f"[SLACK] 접수 응답 전송 완료", flush=True)
+
 
 if __name__ == "__main__":
     app_token = os.environ.get("SLACK_APP_TOKEN", "")
