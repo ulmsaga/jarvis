@@ -20,8 +20,9 @@ channel = sys.argv[1]
 reply_ts = sys.argv[2]
 message = sys.argv[3]
 obj = {'channel': channel, 'text': message}
-if reply_ts:
-    obj['thread_ts'] = reply_ts
+# thread_ts 비활성화 — 채널/DM 모두 직접 전송
+# if reply_ts:
+#     obj['thread_ts'] = reply_ts
 print(json.dumps(obj))
 " "$CHANNEL" "$REPLY_TS" "$MESSAGE")
 

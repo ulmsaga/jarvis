@@ -5,16 +5,27 @@ JARVIS_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 QUEUE="$JARVIS_ROOT/bridge/queue"
 PROCESSING="$JARVIS_ROOT/bridge/processing"
 PANE_FILE="/tmp/jarvis-pane"
+LOCK="/tmp/jarvis-injector.lock"
 
 mkdir -p "$PROCESSING"
 
 log() { echo "[$(date '+%H:%M:%S')] $*"; }
 
+# [Fix 3] 중복 실행 방지 — PID 파일 기반 (macOS 호환)
+if [ -f "$LOCK" ]; then
+  OLD_PID=$(cat "$LOCK")
+  if kill -0 "$OLD_PID" 2>/dev/null; then
+    log "이미 실행 중인 인젝터 있음 (PID: $OLD_PID) — 종료"
+    exit 0
+  fi
+fi
+echo $$ > "$LOCK"
+trap "rm -f '$LOCK'" EXIT
+
 get_pane() {
   local pane
   pane=$(cat "$PANE_FILE" 2>/dev/null)
   [ -z "$pane" ] && return 1
-  # pane이 실제 존재하는지 확인
   tmux list-panes -t "$pane" > /dev/null 2>&1 || return 1
   echo "$pane"
 }
@@ -27,23 +38,41 @@ inject_task() {
   local pane
   pane=$(get_pane) || { log "SKIP: pane 미등록 ($fname)"; return 1; }
 
+  # JSON 한 번에 파싱
+  local parsed
+  parsed=$(python3 -c "
+import json, sys
+d = json.load(open('$file'))
+print(d.get('command',''))
+print(d.get('from',''))
+print(d.get('project',''))
+print(d.get('channel',''))
+print(d.get('reply_ts',''))
+" 2>/dev/null)
+
   local command from project channel reply_ts
-  command=$(python3  -c "import json; d=json.load(open('$file')); print(d.get('command',''))" 2>/dev/null)
-  from=$(python3     -c "import json; d=json.load(open('$file')); print(d.get('from',''))" 2>/dev/null)
-  project=$(python3  -c "import json; d=json.load(open('$file')); print(d.get('project',''))" 2>/dev/null)
-  channel=$(python3  -c "import json; d=json.load(open('$file')); print(d.get('channel',''))" 2>/dev/null)
-  reply_ts=$(python3 -c "import json; d=json.load(open('$file')); print(d.get('reply_ts',''))" 2>/dev/null)
+  command=$(echo "$parsed" | sed -n '1p')
+  from=$(echo "$parsed"    | sed -n '2p')
+  project=$(echo "$parsed" | sed -n '3p')
+  channel=$(echo "$parsed" | sed -n '4p')
+  reply_ts=$(echo "$parsed" | sed -n '5p')
 
-  [ -z "$command" ] && { log "SKIP: command 없음 ($fname)"; mv "$file" "$PROCESSING/$fname"; return 0; }
-
-  mv "$file" "$PROCESSING/$fname"
+  if [ -z "$command" ]; then
+    log "SKIP: command 없음 ($fname)"
+    mv "$file" "$PROCESSING/$fname"
+    return 0
+  fi
 
   local prompt="[JARVIS] from:${from} project:${project} channel:${channel} reply_ts:${reply_ts} | ${command}"
-  tmux send-keys -t "$pane" "$prompt"
-  sleep 0.3
-  tmux send-keys -t "$pane" "" Enter
 
-  log "주입 완료: $fname → $pane"
+  # [Fix 1] 주입 먼저 → 성공 시에만 processing/으로 이동
+  if tmux send-keys -t "$pane" "$prompt" && sleep 0.3 && tmux send-keys -t "$pane" "" Enter; then
+    mv "$file" "$PROCESSING/$fname"
+    log "주입 완료: $fname → $pane"
+  else
+    log "FAIL: tmux 주입 실패 ($fname) — queue 유지, 재시도 예정"
+    return 1
+  fi
 }
 
 log "Injector 시작 (queue: $QUEUE)"

@@ -57,7 +57,8 @@ def handle_mention(event, client, say):
     print(f"[TASK] from={task['from']} project={task['project']} command={task['command']}", flush=True)
 
     if not task["command"]:
-        say(text="명령어를 입력해 주세요.", thread_ts=event["ts"])
+        say(text="명령어를 입력해 주세요.")
+        # thread_ts=event["ts"]  # 댓글 비활성화
         return
 
     path = save_task(task)
@@ -65,7 +66,7 @@ def handle_mention(event, client, say):
 
     client.chat_postMessage(
         channel=event["channel"],
-        thread_ts=event["ts"],
+        # thread_ts=event["ts"],  # 댓글 비활성화 — 직접 메시지로 전송
         text="작업 중입니다. 잠시만 기다려 주세요.",
     )
     print(f"[SLACK] 접수 응답 전송 완료", flush=True)
@@ -99,7 +100,7 @@ def handle_message(event, client):
 
     client.chat_postMessage(
         channel=event["channel"],
-        thread_ts=event["ts"],
+        # thread_ts=event["ts"],  # 댓글 비활성화 — 직접 메시지로 전송
         text="작업 중입니다. 잠시만 기다려 주세요.",
     )
     print(f"[SLACK] 접수 응답 전송 완료", flush=True)
