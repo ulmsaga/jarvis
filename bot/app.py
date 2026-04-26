@@ -20,10 +20,26 @@ def parse_message(text: str, client, event: dict) -> dict:
     # 멘션 제거
     clean = re.sub(r"<@[A-Z0-9]+>", "", text).strip()
 
-    # #project-name 태그 추출
-    project_match = re.search(r"#(\S+)", clean)
-    project = project_match.group(1) if project_match else "unknown"
-    command = re.sub(r"#\S+", "", clean).strip()
+    # 채널 멘션 <#CHANNELID|채널명> 또는 <#CHANNELID> 또는 #project-name 태그로 프로젝트 추출
+    channel_mention = re.search(r"<#([A-Z0-9]+)(?:\|([^>]+))?>", clean)
+    project_tag = re.search(r"(?<!<)#([A-Za-z0-9_-]+)", clean)
+    if channel_mention:
+        channel_id = channel_mention.group(1)
+        channel_name = channel_mention.group(2)
+        if not channel_name:
+            try:
+                info = client.conversations_info(channel=channel_id)
+                channel_name = info["channel"]["name"]
+            except Exception:
+                channel_name = channel_id
+        project = channel_name
+        command = re.sub(r"<#[A-Z0-9]+(?:\|[^>]+)?>", "", clean).strip()
+    elif project_tag:
+        project = project_tag.group(1)
+        command = re.sub(r"#[A-Za-z0-9_-]+", "", clean).strip()
+    else:
+        project = "unknown"
+        command = clean
 
     # 보낸 사람 display name
     try:
