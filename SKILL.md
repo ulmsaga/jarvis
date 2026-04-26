@@ -41,6 +41,19 @@
   4. 완료 보고: "N applied · M skipped"
 ```
 
+### security-scan
+프로젝트 보안 전체 점검 (보고만, 수정 없음)
+```
+동작:
+  1. 하드코딩된 시크릿 스캔 (token, password, secret, API key 패턴)
+  2. .gitignore 검사 (.env, *.log, build 산출물 누락 여부)
+  3. git 트래킹 중인 민감 파일 확인
+  4. git history 전체 토큰/키 패턴 검색
+  5. public repo 여부 확인
+  6. Slack 보고: 심각도별 (🔴 critical / 🟡 warning / 🟢 ok)
+  7. 수정 필요 시 safe-security-fix 또는 git history 재작성 제안
+```
+
 ---
 
 ## 📝 문서화
